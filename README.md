@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.lu-zhengda/mcp-python-exec-sandbox -->
+
 # mcp-python-exec-sandbox
 
 [![CI](https://github.com/lu-zhengda/mcp-python-exec-sandbox/actions/workflows/ci.yml/badge.svg)](https://github.com/lu-zhengda/mcp-python-exec-sandbox/actions/workflows/ci.yml)

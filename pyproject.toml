@@ -1,6 +1,6 @@
 [project]
 name = "mcp-python-exec-sandbox"
-version = "0.1.4"
+version = "0.1.5"
 description = "MCP server for secure Python script execution with automatic dependency management"
 readme = "README.md"
 requires-python = ">=3.13"
