@@ -48,6 +48,7 @@ class TestGetSandbox:
         with (
             patch("shutil.which", return_value="/usr/local/bin/docker"),
             patch("subprocess.run", return_value=mock_result),
+            patch.object(DockerSandbox, "_image_exists", return_value=True),
         ):
             sb = get_sandbox("native")
             assert isinstance(sb, DockerSandbox)
@@ -95,6 +96,7 @@ class TestDockerSandbox:
             assert "--rm" in wrapped
             assert "--read-only" in wrapped
             assert "--memory=512m" in wrapped
+            assert "ghcr.io/lu-zhengda/mcp-python-exec-sandbox" in wrapped
 
     def test_is_available_no_docker(self):
         from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
@@ -102,3 +104,39 @@ class TestDockerSandbox:
         with patch("shutil.which", return_value=None):
             sb = DockerSandbox()
             assert sb.is_available() is False
+
+    def test_is_available_pulls_when_image_missing(self):
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
+
+        mock_result = type("Result", (), {"returncode": 0})()
+        with (
+            patch("shutil.which", return_value="/usr/local/bin/docker"),
+            patch("subprocess.run", return_value=mock_result),
+        ):
+            sb = DockerSandbox()
+        with (
+            patch.object(sb, "_image_exists", return_value=False) as mock_exists,
+            patch.object(sb, "_pull_image", return_value=True) as mock_pull,
+            patch("subprocess.run", return_value=mock_result),
+        ):
+            assert sb.is_available() is True
+            mock_exists.assert_called_once()
+            mock_pull.assert_called_once()
+
+    def test_is_available_skips_pull_when_image_exists(self):
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
+
+        mock_result = type("Result", (), {"returncode": 0})()
+        with (
+            patch("shutil.which", return_value="/usr/local/bin/docker"),
+            patch("subprocess.run", return_value=mock_result),
+        ):
+            sb = DockerSandbox()
+        with (
+            patch.object(sb, "_image_exists", return_value=True) as mock_exists,
+            patch.object(sb, "_pull_image") as mock_pull,
+            patch("subprocess.run", return_value=mock_result),
+        ):
+            assert sb.is_available() is True
+            mock_exists.assert_called_once()
+            mock_pull.assert_not_called()

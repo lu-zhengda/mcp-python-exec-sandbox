@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import subprocess
 from pathlib import Path
 
 from mcp_python_exec_sandbox.sandbox import Sandbox
 
-_IMAGE_NAME = "mcp-python-exec-sandbox"
+_IMAGE_NAME = "ghcr.io/lu-zhengda/mcp-python-exec-sandbox"
+
+logger = logging.getLogger(__name__)
 
 
 class DockerSandbox(Sandbox):
@@ -16,6 +19,45 @@ class DockerSandbox(Sandbox):
 
     def __init__(self) -> None:
         self._docker_path = shutil.which("docker")
+
+    def _image_exists(self) -> bool:
+        """Check if the Docker image is available locally."""
+        docker = self._docker_path or "docker"
+        try:
+            result = subprocess.run(
+                [docker, "image", "inspect", _IMAGE_NAME],
+                capture_output=True,
+                timeout=10,
+            )
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, OSError):
+            return False
+
+    def _pull_image(self) -> bool:
+        """Pull the Docker image from GHCR. Returns True on success."""
+        docker = self._docker_path or "docker"
+        logger.info("Pulling Docker image %s ...", _IMAGE_NAME)
+        try:
+            result = subprocess.run(
+                [docker, "pull", _IMAGE_NAME],
+                capture_output=True,
+                timeout=120,
+            )
+            if result.returncode == 0:
+                logger.info("Successfully pulled %s", _IMAGE_NAME)
+                return True
+            logger.warning(
+                "Failed to pull %s: %s",
+                _IMAGE_NAME,
+                result.stderr.decode(errors="replace").strip(),
+            )
+            return False
+        except subprocess.TimeoutExpired:
+            logger.warning("Timed out pulling %s", _IMAGE_NAME)
+            return False
+        except OSError as exc:
+            logger.warning("Error pulling %s: %s", _IMAGE_NAME, exc)
+            return False
 
     def is_available(self) -> bool:
         if self._docker_path is None:
@@ -26,9 +68,13 @@ class DockerSandbox(Sandbox):
                 capture_output=True,
                 timeout=5,
             )
-            return result.returncode == 0
+            if result.returncode != 0:
+                return False
         except (subprocess.TimeoutExpired, OSError):
             return False
+        if not self._image_exists():
+            return self._pull_image()
+        return True
 
     def wrap(self, cmd: list[str], script_path: Path) -> list[str]:
         script_dir = str(script_path.parent)

@@ -26,7 +26,7 @@ def _docker_available() -> bool:
         return False
 
 
-def _docker_image_exists(name: str = "mcp-python-exec-sandbox") -> bool:
+def _docker_image_exists(name: str = "ghcr.io/lu-zhengda/mcp-python-exec-sandbox") -> bool:
     docker = shutil.which("docker")
     if docker is None:
         return False
@@ -53,7 +53,7 @@ pytestmark = [
     pytest.mark.skipif(
         not _docker_image_exists(),
         reason="mcp-python-exec-sandbox image not built "
-        "(run: docker build -t mcp-python-exec-sandbox profiles/)",
+        "(run: docker build -t ghcr.io/lu-zhengda/mcp-python-exec-sandbox profiles/)",
     ),
 ]
 

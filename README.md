@@ -56,11 +56,10 @@ claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox
 ### Claude Code (macOS -- Docker sandbox, recommended)
 
 ```bash
-docker build -t mcp-python-exec-sandbox profiles/
 claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox
 ```
 
-> The Docker image build requires the repo source. Clone it first: `git clone https://github.com/lu-zhengda/mcp-python-exec-sandbox.git`
+> The Docker sandbox image is pulled automatically from GHCR on first use. No manual build required.
 
 ### Claude Code (no sandbox)
 
@@ -187,8 +186,12 @@ The default backend is `native` (bubblewrap) on Linux and `docker` on macOS/othe
 
 ### Docker sandbox setup
 
+The Docker sandbox image is published to GHCR and pulled automatically when the server starts. No manual setup is needed.
+
+To build locally for development:
+
 ```bash
-docker build -t mcp-python-exec-sandbox profiles/
+docker build -t ghcr.io/lu-zhengda/mcp-python-exec-sandbox profiles/
 ```
 
 ## CLI options
@@ -257,7 +260,7 @@ Prerequisites:
 2. Build the sandbox image:
 
 ```bash
-docker build -t mcp-python-exec-sandbox profiles/
+docker build -t ghcr.io/lu-zhengda/mcp-python-exec-sandbox profiles/
 ```
 
 Then run:

@@ -46,7 +46,7 @@ jobs:
       - uses: astral-sh/setup-uv@v4
         with:
           python-version: "3.13"
-      - run: docker build -t mcp-python-exec-sandbox profiles/
+      - run: docker build -t ghcr.io/lu-zhengda/mcp-python-exec-sandbox profiles/
       - run: uv sync --dev
       - run: uv run pytest e2e_tests/test_docker_sandbox.py -v
 
