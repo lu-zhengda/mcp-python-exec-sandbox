@@ -62,7 +62,38 @@ claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend d
 claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend none
 ```
 
-### Manual JSON config
+### Cursor
+
+Add to `.cursor/mcp.json` (project-level) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "python-sandbox": {
+      "command": "uvx",
+      "args": ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
+    }
+  }
+}
+```
+
+### OpenAI Codex CLI
+
+```bash
+codex mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend native
+```
+
+Or add to `.codex/config.toml`:
+
+```toml
+[mcp_servers.python-sandbox]
+command = "uvx"
+args = ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
+```
+
+### Other MCP clients
+
+Any client that supports the MCP stdio transport can use this server:
 
 ```json
 {
