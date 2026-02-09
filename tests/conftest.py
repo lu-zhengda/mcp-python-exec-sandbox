@@ -2,7 +2,7 @@
 
 import pytest
 
-from mcp_python_sandbox.config import ServerConfig
+from mcp_python_exec_sandbox.config import ServerConfig
 
 
 @pytest.fixture

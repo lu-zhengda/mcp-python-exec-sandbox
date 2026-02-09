@@ -12,11 +12,11 @@ from pathlib import Path
 
 from fastmcp import FastMCP
 
-from mcp_python_sandbox.config import ServerConfig
-from mcp_python_sandbox.executor import execute
-from mcp_python_sandbox.output import format_result
-from mcp_python_sandbox.sandbox import Sandbox, get_sandbox
-from mcp_python_sandbox.script import build_script, extract_metadata
+from mcp_python_exec_sandbox.config import ServerConfig
+from mcp_python_exec_sandbox.executor import execute
+from mcp_python_exec_sandbox.output import format_result
+from mcp_python_exec_sandbox.sandbox import Sandbox, get_sandbox
+from mcp_python_exec_sandbox.script import build_script, extract_metadata
 
 
 @asynccontextmanager
@@ -32,7 +32,7 @@ async def _lifespan(server: FastMCP):
 
     # Warm cache in background (non-blocking)
     if config.warm_cache:
-        from mcp_python_sandbox.cache import warm_cache
+        from mcp_python_exec_sandbox.cache import warm_cache
 
         asyncio.create_task(
             warm_cache(uv_path=config.uv_path, python_version=config.python_version)
@@ -59,7 +59,7 @@ def create_server(config: ServerConfig) -> FastMCP:
         )
 
     mcp = FastMCP(
-        "mcp-python-sandbox",
+        "mcp-python-exec-sandbox",
         lifespan=_lifespan,
     )
     mcp._mcp_config = config  # type: ignore[attr-defined]

@@ -7,8 +7,8 @@ import os
 import time
 from pathlib import Path
 
-from mcp_python_sandbox.errors import ScriptTimeoutError
-from mcp_python_sandbox.output import ExecutionResult
+from mcp_python_exec_sandbox.errors import ScriptTimeoutError
+from mcp_python_exec_sandbox.output import ExecutionResult
 
 
 def _build_clean_env(uv_cache_dir: str | None = None) -> dict[str, str]:

@@ -1,4 +1,4 @@
-"""CLI entry point for mcp-python-sandbox."""
+"""CLI entry point for mcp-python-exec-sandbox."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="mcp-python-sandbox",
+        prog="mcp-python-exec-sandbox",
         description="MCP server for secure Python script execution",
     )
     parser.add_argument(
@@ -56,8 +56,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
 
-    from mcp_python_sandbox.config import ServerConfig
-    from mcp_python_sandbox.server import create_server
+    from mcp_python_exec_sandbox.config import ServerConfig
+    from mcp_python_exec_sandbox.server import create_server
 
     config = ServerConfig(
         python_version=args.python_version,

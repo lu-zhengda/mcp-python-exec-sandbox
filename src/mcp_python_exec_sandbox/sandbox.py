@@ -58,11 +58,11 @@ def get_sandbox(backend: str) -> Sandbox:
 
     if backend == "native":
         if sys.platform == "linux":
-            from mcp_python_sandbox.sandbox_linux import BubblewrapSandbox
+            from mcp_python_exec_sandbox.sandbox_linux import BubblewrapSandbox
 
             sb = BubblewrapSandbox()
         elif sys.platform == "darwin":
-            from mcp_python_sandbox.sandbox_macos import SandboxExecSandbox
+            from mcp_python_exec_sandbox.sandbox_macos import SandboxExecSandbox
 
             sb = SandboxExecSandbox()
         else:
@@ -84,7 +84,7 @@ def get_sandbox(backend: str) -> Sandbox:
         return sb
 
     if backend == "docker":
-        from mcp_python_sandbox.sandbox_docker import DockerSandbox
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
 
         sb = DockerSandbox()
         if not sb.is_available():

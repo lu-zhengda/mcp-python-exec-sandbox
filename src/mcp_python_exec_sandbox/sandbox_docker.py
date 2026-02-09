@@ -6,9 +6,9 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from mcp_python_sandbox.sandbox import Sandbox
+from mcp_python_exec_sandbox.sandbox import Sandbox
 
-_IMAGE_NAME = "mcp-python-sandbox"
+_IMAGE_NAME = "mcp-python-exec-sandbox"
 
 
 class DockerSandbox(Sandbox):
@@ -45,7 +45,7 @@ class DockerSandbox(Sandbox):
             "--memory=512m",
             "--cpus=1",
             "--tmpfs", "/tmp:rw,noexec,nosuid,size=100m",
-            "-v", "mcp-python-sandbox-uv-cache:/cache",
+            "-v", "mcp-python-exec-sandbox-uv-cache:/cache",
             "-v", f"{script_dir}:/work",
             "-e", "UV_CACHE_DIR=/cache",
             "-e", "UV_PYTHON_INSTALL_DIR=/cache/python",

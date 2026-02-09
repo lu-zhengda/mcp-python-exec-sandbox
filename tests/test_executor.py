@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from mcp_python_sandbox.executor import execute, _build_clean_env
-from mcp_python_sandbox.output import ExecutionResult
+from mcp_python_exec_sandbox.executor import execute, _build_clean_env
+from mcp_python_exec_sandbox.output import ExecutionResult
 
 
 class TestBuildCleanEnv:

@@ -13,7 +13,7 @@ MCP server for sandboxed Python execution. Scripts run in ephemeral, isolated en
 ## Structure
 
 ```
-src/mcp_python_sandbox/   # Package source
+src/mcp_python_exec_sandbox/   # Package source
   server.py               # FastMCP server + tool definitions
   executor.py             # uv subprocess orchestration
   script.py               # PEP 723 metadata parsing/merging

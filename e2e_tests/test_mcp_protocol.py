@@ -13,7 +13,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 _SERVER_CMD = [
-    sys.executable, "-m", "mcp_python_sandbox",
+    sys.executable, "-m", "mcp_python_exec_sandbox",
     "--sandbox-backend", "none",
     "--no-warm-cache",
 ]

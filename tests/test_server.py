@@ -4,8 +4,8 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from mcp_python_sandbox.config import ServerConfig
-from mcp_python_sandbox.server import create_server
+from mcp_python_exec_sandbox.config import ServerConfig
+from mcp_python_exec_sandbox.server import create_server
 
 
 @pytest.fixture

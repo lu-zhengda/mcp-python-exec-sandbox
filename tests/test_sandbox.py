@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from mcp_python_sandbox.sandbox import NoopSandbox, get_sandbox
+from mcp_python_exec_sandbox.sandbox import NoopSandbox, get_sandbox
 
 
 class TestNoopSandbox:
@@ -54,7 +54,7 @@ class TestGetSandbox:
 class TestBubblewrapSandbox:
     @pytest.mark.skipif(sys.platform != "linux", reason="Linux only")
     def test_wrap_command(self):
-        from mcp_python_sandbox.sandbox_linux import BubblewrapSandbox
+        from mcp_python_exec_sandbox.sandbox_linux import BubblewrapSandbox
 
         with patch("shutil.which", return_value="/usr/bin/bwrap"):
             sb = BubblewrapSandbox()
@@ -71,7 +71,7 @@ class TestBubblewrapSandbox:
 class TestSandboxExecSandbox:
     @pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
     def test_wrap_command(self):
-        from mcp_python_sandbox.sandbox_macos import SandboxExecSandbox
+        from mcp_python_exec_sandbox.sandbox_macos import SandboxExecSandbox
 
         with patch("shutil.which", return_value="/usr/bin/sandbox-exec"):
             sb = SandboxExecSandbox()
@@ -84,7 +84,7 @@ class TestSandboxExecSandbox:
 
     @pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
     def test_describe(self):
-        from mcp_python_sandbox.sandbox_macos import SandboxExecSandbox
+        from mcp_python_exec_sandbox.sandbox_macos import SandboxExecSandbox
 
         with patch("shutil.which", return_value="/usr/bin/sandbox-exec"):
             sb = SandboxExecSandbox()
@@ -93,7 +93,7 @@ class TestSandboxExecSandbox:
 
 class TestDockerSandbox:
     def test_wrap_command(self):
-        from mcp_python_sandbox.sandbox_docker import DockerSandbox
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
 
         with patch("shutil.which", return_value="/usr/local/bin/docker"):
             sb = DockerSandbox()
@@ -106,7 +106,7 @@ class TestDockerSandbox:
             assert "--memory=512m" in wrapped
 
     def test_is_available_no_docker(self):
-        from mcp_python_sandbox.sandbox_docker import DockerSandbox
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
 
         with patch("shutil.which", return_value=None):
             sb = DockerSandbox()

@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from mcp_python_sandbox.executor import execute
-from mcp_python_sandbox.output import ExecutionResult
-from mcp_python_sandbox.script import build_script
+from mcp_python_exec_sandbox.executor import execute
+from mcp_python_exec_sandbox.output import ExecutionResult
+from mcp_python_exec_sandbox.script import build_script
 
 pytestmark = pytest.mark.skipif(
     shutil.which("uv") is None,

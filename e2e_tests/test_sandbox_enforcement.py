@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mcp_python_sandbox.executor import execute
-from mcp_python_sandbox.sandbox import get_sandbox
+from mcp_python_exec_sandbox.executor import execute
+from mcp_python_exec_sandbox.sandbox import get_sandbox
 
 pytestmark = [
     pytest.mark.skipif(

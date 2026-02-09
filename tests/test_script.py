@@ -2,8 +2,8 @@
 
 import pytest
 
-from mcp_python_sandbox.errors import ScriptMetadataError
-from mcp_python_sandbox.script import (
+from mcp_python_exec_sandbox.errors import ScriptMetadataError
+from mcp_python_exec_sandbox.script import (
     build_script,
     extract_metadata,
     strip_metadata,

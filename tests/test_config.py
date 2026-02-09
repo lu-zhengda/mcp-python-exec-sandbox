@@ -2,8 +2,8 @@
 
 import pytest
 
-from mcp_python_sandbox.config import ServerConfig
-from mcp_python_sandbox.__main__ import parse_args
+from mcp_python_exec_sandbox.config import ServerConfig
+from mcp_python_exec_sandbox.__main__ import parse_args
 
 
 class TestServerConfig:

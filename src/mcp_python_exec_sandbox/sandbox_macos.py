@@ -5,7 +5,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-from mcp_python_sandbox.sandbox import Sandbox
+from mcp_python_exec_sandbox.sandbox import Sandbox
 
 _PROFILE_DIR = Path(__file__).parent.parent.parent / "profiles"
 

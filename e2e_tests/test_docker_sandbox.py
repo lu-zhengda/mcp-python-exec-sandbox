@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mcp_python_sandbox.executor import execute
-from mcp_python_sandbox.sandbox import get_sandbox
+from mcp_python_exec_sandbox.executor import execute
+from mcp_python_exec_sandbox.sandbox import get_sandbox
 
 
 def _docker_available() -> bool:
@@ -24,7 +24,7 @@ def _docker_available() -> bool:
         return False
 
 
-def _docker_image_exists(name: str = "mcp-python-sandbox") -> bool:
+def _docker_image_exists(name: str = "mcp-python-exec-sandbox") -> bool:
     docker = shutil.which("docker")
     if docker is None:
         return False
@@ -49,7 +49,7 @@ pytestmark = [
     ),
     pytest.mark.skipif(
         not _docker_image_exists(),
-        reason="mcp-python-sandbox image not built (run: docker build -t mcp-python-sandbox profiles/)",
+        reason="mcp-python-exec-sandbox image not built (run: docker build -t mcp-python-exec-sandbox profiles/)",
     ),
 ]
 

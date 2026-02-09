@@ -1,10 +1,10 @@
-# mcp-python-sandbox
+# mcp-python-exec-sandbox
 
 Sandboxed Python execution for AI agents. Scripts run in ephemeral, isolated environments with inline dependencies ([PEP 723](https://peps.python.org/pep-0723/)) -- **zero host pollution, zero leftover venvs, zero package conflicts**.
 
 ## Why?
 
-Every coding agent can already run Python on your host. The problem is what happens next: packages accumulate, venvs sprawl, and a rogue `pip install` breaks your system. **mcp-python-sandbox** eliminates this:
+Every coding agent can already run Python on your host. The problem is what happens next: packages accumulate, venvs sprawl, and a rogue `pip install` breaks your system. **mcp-python-exec-sandbox** eliminates this:
 
 - Scripts execute in a sandbox (bubblewrap on Linux, sandbox-exec on macOS, Docker everywhere)
 - Dependencies are declared inline and resolved ephemerally via `uv`
@@ -44,22 +44,22 @@ Additional requirements depend on your chosen sandbox backend:
 ### Claude Code (native sandbox -- recommended)
 
 ```bash
-claude mcp add python-sandbox -- uvx mcp-python-sandbox --sandbox-backend native
+claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend native
 ```
 
 ### Claude Code (Docker sandbox)
 
 ```bash
-docker build -t mcp-python-sandbox profiles/
-claude mcp add python-sandbox -- uvx mcp-python-sandbox --sandbox-backend docker
+docker build -t mcp-python-exec-sandbox profiles/
+claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend docker
 ```
 
-> The Docker image build requires the repo source. Clone it first: `git clone https://github.com/lu-zhengda/mcp-python-sandbox.git`
+> The Docker image build requires the repo source. Clone it first: `git clone https://github.com/lu-zhengda/mcp-python-exec-sandbox.git`
 
 ### Claude Code (no sandbox)
 
 ```bash
-claude mcp add python-sandbox -- uvx mcp-python-sandbox --sandbox-backend none
+claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend none
 ```
 
 ### Manual JSON config
@@ -69,7 +69,7 @@ claude mcp add python-sandbox -- uvx mcp-python-sandbox --sandbox-backend none
   "mcpServers": {
     "python-sandbox": {
       "command": "uvx",
-      "args": ["mcp-python-sandbox", "--sandbox-backend", "native"]
+      "args": ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
     }
   }
 }
@@ -81,13 +81,13 @@ Use `--python-version` to target a specific Python version. uv downloads it auto
 
 ```bash
 # Python 3.13 (default)
-uvx mcp-python-sandbox --python-version 3.13
+uvx mcp-python-exec-sandbox --python-version 3.13
 
 # Python 3.14
-uvx mcp-python-sandbox --python-version 3.14
+uvx mcp-python-exec-sandbox --python-version 3.14
 
 # Python 3.15
-uvx mcp-python-sandbox --python-version 3.15
+uvx mcp-python-exec-sandbox --python-version 3.15
 ```
 
 This works across all sandbox backends. The Docker sandbox uses uv inside the container to manage Python versions, so the same `--python-version` flag applies.
@@ -152,13 +152,13 @@ If the requested sandbox tool is unavailable, the server falls back to `none` wi
 ### Docker sandbox setup
 
 ```bash
-docker build -t mcp-python-sandbox profiles/
+docker build -t mcp-python-exec-sandbox profiles/
 ```
 
 ## CLI options
 
 ```
-mcp-python-sandbox [OPTIONS]
+mcp-python-exec-sandbox [OPTIONS]
 
 Options:
   --python-version TEXT     Python version for execution (default: 3.13)
@@ -175,15 +175,15 @@ Options:
 ### Setup
 
 ```bash
-git clone https://github.com/lu-zhengda/mcp-python-sandbox.git
-cd mcp-python-sandbox
+git clone https://github.com/lu-zhengda/mcp-python-exec-sandbox.git
+cd mcp-python-exec-sandbox
 uv sync --dev
 ```
 
 ### Project structure
 
 ```
-src/mcp_python_sandbox/   # Package source
+src/mcp_python_exec_sandbox/   # Package source
   server.py               # FastMCP server + tool definitions
   executor.py             # uv subprocess orchestration
   script.py               # PEP 723 metadata parsing/merging
@@ -220,7 +220,7 @@ Prerequisites:
 2. Build the sandbox image:
 
 ```bash
-docker build -t mcp-python-sandbox profiles/
+docker build -t mcp-python-exec-sandbox profiles/
 ```
 
 Then run:
