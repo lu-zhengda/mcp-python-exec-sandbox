@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.lu-zhengda/mcp-python-exec-sandbox",
   "title": "Python Exec Sandbox",
-  "description": "Sandboxed Python execution for AI agents with PEP 723 inline deps, multi-version Python, zero host pollution.",
+  "description": "Sandboxed Python execution for AI agents. PEP 723 inline deps, multi-version Python, zero pollution.",
   "repository": {
     "url": "https://github.com/lu-zhengda/mcp-python-exec-sandbox",
     "source": "github"
