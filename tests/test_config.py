@@ -56,9 +56,12 @@ class TestServerConfig:
 
 class TestParseArgs:
     def test_defaults(self):
+        import sys
+
         args = parse_args([])
         assert args.python_version == "3.13"
-        assert args.sandbox_backend == "native"
+        expected_backend = "native" if sys.platform == "linux" else "docker"
+        assert args.sandbox_backend == expected_backend
         assert args.max_timeout == 300
         assert args.default_timeout == 30
         assert args.max_output_bytes == 102_400

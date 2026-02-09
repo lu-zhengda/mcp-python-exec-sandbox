@@ -40,7 +40,17 @@ class TestGetSandbox:
             assert isinstance(sb, NoopSandbox)
 
     @patch("sys.platform", "darwin")
-    def test_native_macos_fallback_when_sandbox_exec_missing(self):
+    def test_native_macos_uses_docker(self):
+        """On macOS, 'native' redirects to Docker sandbox."""
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
+
+        with patch("shutil.which", return_value="/usr/local/bin/docker"):
+            sb = get_sandbox("native")
+            assert isinstance(sb, DockerSandbox)
+
+    @patch("sys.platform", "darwin")
+    def test_native_macos_falls_back_when_docker_missing(self):
+        """On macOS, 'native' falls back to NoopSandbox if Docker is unavailable."""
         with patch("shutil.which", return_value=None):
             sb = get_sandbox("native")
             assert isinstance(sb, NoopSandbox)
@@ -66,29 +76,6 @@ class TestBubblewrapSandbox:
             assert "--die-with-parent" in wrapped
             # Original command should be at the end
             assert wrapped[-6:] == cmd
-
-
-class TestSandboxExecSandbox:
-    @pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
-    def test_wrap_command(self):
-        from mcp_python_exec_sandbox.sandbox_macos import SandboxExecSandbox
-
-        with patch("shutil.which", return_value="/usr/bin/sandbox-exec"):
-            sb = SandboxExecSandbox()
-            cmd = ["uv", "run", "--script", "--python", "3.13", "/tmp/test.py"]
-            wrapped = sb.wrap(cmd, Path("/tmp/test.py"))
-            assert wrapped[0] == "/usr/bin/sandbox-exec"
-            assert "-p" in wrapped
-            # Original command should be at the end
-            assert wrapped[-6:] == cmd
-
-    @pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
-    def test_describe(self):
-        from mcp_python_exec_sandbox.sandbox_macos import SandboxExecSandbox
-
-        with patch("shutil.which", return_value="/usr/bin/sandbox-exec"):
-            sb = SandboxExecSandbox()
-            assert "sandbox-exec" in sb.describe()
 
 
 class TestDockerSandbox:

@@ -6,7 +6,7 @@ Sandboxed Python execution for AI agents. Scripts run in ephemeral, isolated env
 
 Every coding agent can already run Python on your host. The problem is what happens next: packages accumulate, venvs sprawl, and a rogue `pip install` breaks your system. **mcp-python-exec-sandbox** eliminates this:
 
-- Scripts execute in a sandbox (bubblewrap on Linux, sandbox-exec on macOS, Docker everywhere)
+- Scripts execute in a sandbox (bubblewrap on Linux, Docker on macOS/other platforms)
 - Dependencies are declared inline and resolved ephemerally via `uv`
 - Nothing touches your host's Python, site-packages, or virtualenvs
 - Each execution is isolated and disposable
@@ -33,25 +33,24 @@ Additional requirements depend on your chosen sandbox backend:
 | Setup | Additional requirements | Install |
 |-------|------------------------|---------|
 | **Native sandbox (Linux)** | [bubblewrap](https://github.com/containers/bubblewrap) | `sudo apt install bubblewrap` |
-| **Native sandbox (macOS)** | None -- `sandbox-exec` is built into macOS | -- |
-| **Docker sandbox** | [Docker Engine](https://docs.docker.com/engine/install/) | See Docker docs |
+| **Docker sandbox (macOS, any)** | [Docker Engine](https://docs.docker.com/engine/install/) | See Docker docs |
 | **No sandbox** | None | -- |
 
 > **Host Python vs. execution Python:** These are independent. Python 3.13+ is needed to run the server process itself. The `--python-version` flag controls which Python version your *scripts* execute on -- uv downloads the target version automatically. You do not need to install Python 3.14 or 3.15 on your host to run scripts on those versions.
 
 ## Quick start
 
-### Claude Code (native sandbox -- recommended)
+### Claude Code (Linux -- native sandbox)
 
 ```bash
-claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend native
+claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox
 ```
 
-### Claude Code (Docker sandbox)
+### Claude Code (macOS -- Docker sandbox, recommended)
 
 ```bash
 docker build -t mcp-python-exec-sandbox profiles/
-claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend docker
+claude mcp add python-sandbox -- uvx mcp-python-exec-sandbox
 ```
 
 > The Docker image build requires the repo source. Clone it first: `git clone https://github.com/lu-zhengda/mcp-python-exec-sandbox.git`
@@ -71,7 +70,7 @@ Add to `.cursor/mcp.json` (project-level) or `~/.cursor/mcp.json` (global):
   "mcpServers": {
     "python-sandbox": {
       "command": "uvx",
-      "args": ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
+      "args": ["mcp-python-exec-sandbox"]
     }
   }
 }
@@ -80,7 +79,7 @@ Add to `.cursor/mcp.json` (project-level) or `~/.cursor/mcp.json` (global):
 ### OpenAI Codex CLI
 
 ```bash
-codex mcp add python-sandbox -- uvx mcp-python-exec-sandbox --sandbox-backend native
+codex mcp add python-sandbox -- uvx mcp-python-exec-sandbox
 ```
 
 Or add to `.codex/config.toml`:
@@ -88,7 +87,7 @@ Or add to `.codex/config.toml`:
 ```toml
 [mcp_servers.python-sandbox]
 command = "uvx"
-args = ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
+args = ["mcp-python-exec-sandbox"]
 ```
 
 ### Other MCP clients
@@ -100,7 +99,7 @@ Any client that supports the MCP stdio transport can use this server:
   "mcpServers": {
     "python-sandbox": {
       "command": "uvx",
-      "args": ["mcp-python-exec-sandbox", "--sandbox-backend", "native"]
+      "args": ["mcp-python-exec-sandbox"]
     }
   }
 }
@@ -174,11 +173,10 @@ Validates a script's PEP 723 metadata and dependencies without executing it.
 | Backend | Platform | Tool | Notes |
 |---------|----------|------|-------|
 | `native` | Linux | bubblewrap | Namespace isolation, network allowed |
-| `native` | macOS | sandbox-exec | Seatbelt profiles, network allowed |
 | `docker` | Any | Docker | Container isolation, resource limits |
 | `none` | Any | -- | No sandboxing (not recommended) |
 
-If the requested sandbox tool is unavailable, the server falls back to `none` with a warning.
+The default backend is `native` (bubblewrap) on Linux and `docker` on macOS/other platforms. Specifying `--sandbox-backend native` on macOS automatically redirects to Docker. If the sandbox tool is unavailable, the server falls back to `none` with a warning.
 
 ### Docker sandbox setup
 
@@ -193,7 +191,7 @@ mcp-python-exec-sandbox [OPTIONS]
 
 Options:
   --python-version TEXT     Python version for execution (default: 3.13)
-  --sandbox-backend TEXT    native | docker | none (default: native)
+  --sandbox-backend TEXT    native | docker | none (default: native on Linux, docker on macOS)
   --max-timeout INT         Maximum allowed timeout in seconds (default: 300)
   --default-timeout INT     Default timeout in seconds (default: 30)
   --max-output-bytes INT    Maximum output size in bytes (default: 102400)
@@ -219,11 +217,12 @@ src/mcp_python_exec_sandbox/   # Package source
   executor.py             # uv subprocess orchestration
   script.py               # PEP 723 metadata parsing/merging
   sandbox.py              # Sandbox ABC + factory
-  sandbox_{linux,macos,docker}.py
+  sandbox_linux.py        # bubblewrap sandbox (Linux)
+  sandbox_docker.py       # Docker sandbox (macOS/any)
   config.py, cache.py, output.py, errors.py
 tests/                    # Unit + integration tests (mocked or local uv)
 e2e_tests/                # End-to-end tests (require uv + network)
-profiles/                 # Dockerfile, macOS seatbelt profile, warmup packages
+profiles/                 # Dockerfile, warmup packages
 .devcontainer/            # Devcontainer for Linux sandbox testing from macOS
 ```
 
@@ -308,7 +307,7 @@ devcontainer exec --workspace-folder . uv run pytest e2e_tests/test_sandbox_enfo
 - Add tests for new functionality: unit tests in `tests/`, E2E in `e2e_tests/` if it needs real execution.
 - Keep dependencies minimal. Do not add runtime deps without strong justification.
 - Tool docstrings in `server.py` are user-facing MCP tool descriptions. Write them for an LLM audience.
-- Sandbox backends must degrade gracefully: if the tool is missing, fall back to `NoopSandbox` with a warning.
+- Sandbox backends must degrade gracefully: if the required tool (bwrap, docker) is missing, fall back to `NoopSandbox` with a warning.
 
 ## License
 

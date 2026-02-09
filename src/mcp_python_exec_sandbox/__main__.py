@@ -3,9 +3,16 @@
 from __future__ import annotations
 
 import argparse
+import sys
+
+
+def _default_sandbox_backend() -> str:
+    """Return the platform-appropriate default sandbox backend."""
+    return "native" if sys.platform == "linux" else "docker"
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    default_backend = _default_sandbox_backend()
     parser = argparse.ArgumentParser(
         prog="mcp-python-exec-sandbox",
         description="MCP server for secure Python script execution",
@@ -18,8 +25,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--sandbox-backend",
         choices=["native", "docker", "none"],
-        default="native",
-        help="Sandbox backend: native (bwrap/sandbox-exec), docker, or none (default: native)",
+        default=default_backend,
+        help=(
+            "Sandbox backend: native (bwrap, Linux only), docker, or none "
+            f"(default: {default_backend})"
+        ),
     )
     parser.add_argument(
         "--max-timeout",

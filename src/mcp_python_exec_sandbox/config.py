@@ -10,7 +10,7 @@ class ServerConfig:
     """Configuration for the MCP Python executor server."""
 
     python_version: str = "3.13"
-    sandbox_backend: str = "native"  # "native" | "docker" | "none"
+    sandbox_backend: str = "native"  # "native" (Linux) | "docker" | "none"
     max_timeout: int = 300
     default_timeout: int = 30
     max_output_bytes: int = 102_400  # 100KB

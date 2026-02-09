@@ -18,11 +18,12 @@ src/mcp_python_exec_sandbox/   # Package source
   executor.py             # uv subprocess orchestration
   script.py               # PEP 723 metadata parsing/merging
   sandbox.py              # Sandbox ABC + factory
-  sandbox_{linux,macos,docker}.py
+  sandbox_linux.py        # bubblewrap sandbox (Linux)
+  sandbox_docker.py       # Docker sandbox (macOS/any)
   config.py, cache.py, output.py, errors.py
 tests/                    # Unit + integration tests (mocked or local uv)
 e2e_tests/                # End-to-end tests (require uv + network)
-profiles/                 # Dockerfile, macOS seatbelt profile, warmup packages
+profiles/                 # Dockerfile, warmup packages
 ```
 
 ## Commands
@@ -40,7 +41,7 @@ uv run pytest e2e_tests/ -v  # E2E tests (slow, needs network)
 - Lint with `uv run ruff check .` and format with `uv run ruff format --check .` before committing. Fix issues with `--fix` / `ruff format .`.
 - Tool docstrings in `server.py` are user-facing — they become the MCP tool descriptions that agents see. Write them for an LLM audience: include examples, avoid unexplained jargon, link PEPs.
 - Always pin versions in examples (e.g. `"pandas>=2.2"` not `"pandas"`).
-- Sandbox backends must degrade gracefully: if the tool (bwrap, sandbox-exec, docker) is missing, fall back to `NoopSandbox` with a warning.
+- Sandbox backends must degrade gracefully: if the tool (bwrap, docker) is missing, fall back to `NoopSandbox` with a warning. Native sandbox is Linux-only (bwrap); macOS defaults to Docker.
 
 ## Contribution format
 
