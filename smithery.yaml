@@ -1,0 +1,72 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    properties:
+      sandboxBackend:
+        type: string
+        enum:
+          - native
+          - docker
+          - none
+        description: >-
+          Sandbox backend: native (bwrap, Linux only), docker, or none.
+          Defaults to native on Linux, docker on macOS.
+      pythonVersion:
+        type: string
+        default: "3.13"
+        description: Python version for script execution (default: 3.13).
+      maxTimeout:
+        type: integer
+        minimum: 1
+        default: 300
+        description: Maximum allowed timeout in seconds (default: 300).
+      defaultTimeout:
+        type: integer
+        minimum: 1
+        default: 30
+        description: Default timeout in seconds (default: 30).
+      maxOutputBytes:
+        type: integer
+        minimum: 1024
+        default: 102400
+        description: Maximum output size in bytes (default: 102400).
+      noWarmCache:
+        type: boolean
+        default: false
+        description: Skip cache warming on startup.
+      uvPath:
+        type: string
+        default: "uv"
+        description: Path to uv binary (default: uv).
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    (config) => {
+      const args = ['mcp-python-exec-sandbox'];
+      if (config.sandboxBackend) {
+        args.push('--sandbox-backend', config.sandboxBackend);
+      }
+      if (config.pythonVersion) {
+        args.push('--python-version', config.pythonVersion);
+      }
+      if (config.maxTimeout !== undefined) {
+        args.push('--max-timeout', String(config.maxTimeout));
+      }
+      if (config.defaultTimeout !== undefined) {
+        args.push('--default-timeout', String(config.defaultTimeout));
+      }
+      if (config.maxOutputBytes !== undefined) {
+        args.push('--max-output-bytes', String(config.maxOutputBytes));
+      }
+      if (config.noWarmCache) {
+        args.push('--no-warm-cache');
+      }
+      if (config.uvPath) {
+        args.push('--uv-path', config.uvPath);
+      }
+      return { command: 'uvx', args };
+    }
