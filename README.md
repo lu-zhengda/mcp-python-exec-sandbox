@@ -1,5 +1,10 @@
 # mcp-python-exec-sandbox
 
+[![CI](https://github.com/lu-zhengda/mcp-python-exec-sandbox/actions/workflows/ci.yml/badge.svg)](https://github.com/lu-zhengda/mcp-python-exec-sandbox/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/mcp-python-exec-sandbox)](https://pypi.org/project/mcp-python-exec-sandbox/)
+[![Python](https://img.shields.io/pypi/pyversions/mcp-python-exec-sandbox)](https://pypi.org/project/mcp-python-exec-sandbox/)
+[![License](https://img.shields.io/github/license/lu-zhengda/mcp-python-exec-sandbox)](https://github.com/lu-zhengda/mcp-python-exec-sandbox/blob/main/LICENSE)
+
 Sandboxed Python execution for AI agents. Scripts run in ephemeral, isolated environments with inline dependencies ([PEP 723](https://peps.python.org/pep-0723/)) -- **zero host pollution, zero leftover venvs, zero package conflicts**.
 
 ## Why?
