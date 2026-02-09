@@ -13,8 +13,11 @@ pytestmark = pytest.mark.skipif(
 )
 
 _SERVER_CMD = [
-    sys.executable, "-m", "mcp_python_exec_sandbox",
-    "--sandbox-backend", "none",
+    sys.executable,
+    "-m",
+    "mcp_python_exec_sandbox",
+    "--sandbox-backend",
+    "none",
     "--no-warm-cache",
 ]
 
@@ -54,11 +57,14 @@ class MCPClient:
         return json.loads(line)
 
     def initialize(self):
-        result = self.send("initialize", {
-            "protocolVersion": "2024-11-05",
-            "capabilities": {},
-            "clientInfo": {"name": "test", "version": "1.0"},
-        })
+        result = self.send(
+            "initialize",
+            {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "test", "version": "1.0"},
+            },
+        )
         self.send("notifications/initialized", {}, notify=True)
         return result
 
@@ -125,35 +131,44 @@ class TestMCPProtocol:
 
     def test_execute_simple_script(self, mcp):
         """Test executing a simple print script."""
-        result = mcp.call_tool("execute_python", {
-            "script": "print('hello from mcp')",
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": "print('hello from mcp')",
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "hello from mcp" in text
         assert "exit_code: 0" in text
 
     def test_execute_with_deps(self, mcp):
         """Test executing a script with dependencies."""
-        result = mcp.call_tool("execute_python", {
-            "script": "import pydantic; print(f'v{pydantic.__version__}')",
-            "dependencies": ["pydantic>=2.0"],
-            "timeout_seconds": 120,
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": "import pydantic; print(f'v{pydantic.__version__}')",
+                "dependencies": ["pydantic>=2.0"],
+                "timeout_seconds": 120,
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "exit_code: 0" in text
         assert "v2." in text
 
     def test_execute_pandas(self, mcp):
         """Test executing a pandas script via MCP."""
-        result = mcp.call_tool("execute_python", {
-            "script": (
-                "import pandas as pd; "
-                "df = pd.DataFrame({'a': [1,2,3], 'b': [4,5,6]}); "
-                "print(df.sum().to_dict())"
-            ),
-            "dependencies": ["pandas"],
-            "timeout_seconds": 120,
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": (
+                    "import pandas as pd; "
+                    "df = pd.DataFrame({'a': [1,2,3], 'b': [4,5,6]}); "
+                    "print(df.sum().to_dict())"
+                ),
+                "dependencies": ["pandas"],
+                "timeout_seconds": 120,
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "exit_code: 0" in text
         assert "'a': 6" in text
@@ -161,16 +176,19 @@ class TestMCPProtocol:
 
     def test_execute_numpy_scipy(self, mcp):
         """Test numpy + scipy through MCP."""
-        result = mcp.call_tool("execute_python", {
-            "script": (
-                "import numpy as np; from scipy import stats; "
-                "np.random.seed(42); "
-                "r, p = stats.pearsonr(np.random.randn(100), np.random.randn(100)); "
-                "print(f'r={r:.4f}')"
-            ),
-            "dependencies": ["numpy", "scipy"],
-            "timeout_seconds": 120,
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": (
+                    "import numpy as np; from scipy import stats; "
+                    "np.random.seed(42); "
+                    "r, p = stats.pearsonr(np.random.randn(100), np.random.randn(100)); "
+                    "print(f'r={r:.4f}')"
+                ),
+                "dependencies": ["numpy", "scipy"],
+                "timeout_seconds": 120,
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "exit_code: 0" in text
         assert "r=" in text
@@ -178,11 +196,11 @@ class TestMCPProtocol:
     def test_execute_with_pep723_inline(self, mcp):
         """Test a script with inline PEP 723 metadata block."""
         script = (
-            '# /// script\n'
+            "# /// script\n"
             '# dependencies = ["rich"]\n'
-            '# ///\n'
-            '\n'
-            'from rich.text import Text\n'
+            "# ///\n"
+            "\n"
+            "from rich.text import Text\n"
             'print(Text("hello").plain)\n'
         )
         result = mcp.call_tool("execute_python", {"script": script, "timeout_seconds": 120})
@@ -192,28 +210,37 @@ class TestMCPProtocol:
 
     def test_execute_timeout(self, mcp):
         """Test that timeout is enforced."""
-        result = mcp.call_tool("execute_python", {
-            "script": "import time; time.sleep(60)",
-            "timeout_seconds": 2,
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": "import time; time.sleep(60)",
+                "timeout_seconds": 2,
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "timed_out: true" in text
 
     def test_execute_nonzero_exit(self, mcp):
         """Test script that exits with non-zero code."""
-        result = mcp.call_tool("execute_python", {
-            "script": "import sys; print('bye'); sys.exit(1)",
-        })
+        result = mcp.call_tool(
+            "execute_python",
+            {
+                "script": "import sys; print('bye'); sys.exit(1)",
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "exit_code: 1" in text
         assert "bye" in text
 
     def test_validate_script_valid(self, mcp):
         """Test validate_script with valid deps."""
-        result = mcp.call_tool("validate_script", {
-            "script": "import pandas",
-            "dependencies": ["pandas>=2.0", "numpy"],
-        })
+        result = mcp.call_tool(
+            "validate_script",
+            {
+                "script": "import pandas",
+                "dependencies": ["pandas>=2.0", "numpy"],
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "VALID" in text
         assert "pandas>=2.0" in text
@@ -221,9 +248,12 @@ class TestMCPProtocol:
 
     def test_validate_script_no_deps(self, mcp):
         """Test validate_script with a bare script."""
-        result = mcp.call_tool("validate_script", {
-            "script": "print('hello')",
-        })
+        result = mcp.call_tool(
+            "validate_script",
+            {
+                "script": "print('hello')",
+            },
+        )
         text = result["result"]["content"][0]["text"]
         assert "VALID" in text
         assert "dependencies: none" in text
@@ -231,12 +261,12 @@ class TestMCPProtocol:
     def test_validate_script_inline_metadata(self, mcp):
         """Test validate_script with inline PEP 723 metadata."""
         script = (
-            '# /// script\n'
+            "# /// script\n"
             '# dependencies = ["requests"]\n'
             '# requires-python = ">=3.11"\n'
-            '# ///\n'
-            '\n'
-            'import requests\n'
+            "# ///\n"
+            "\n"
+            "import requests\n"
         )
         result = mcp.call_tool("validate_script", {"script": script})
         text = result["result"]["content"][0]["text"]

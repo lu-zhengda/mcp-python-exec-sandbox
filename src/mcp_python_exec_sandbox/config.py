@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -27,8 +27,6 @@ class ServerConfig:
         if self.max_timeout < 1:
             raise ValueError("max_timeout must be >= 1")
         if self.default_timeout < 1 or self.default_timeout > self.max_timeout:
-            raise ValueError(
-                f"default_timeout must be between 1 and {self.max_timeout}"
-            )
+            raise ValueError(f"default_timeout must be between 1 and {self.max_timeout}")
         if self.max_output_bytes < 1024:
             raise ValueError("max_output_bytes must be >= 1024")

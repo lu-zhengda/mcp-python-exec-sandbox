@@ -13,14 +13,14 @@ from mcp_python_exec_sandbox.script import (
 
 
 def test_extract_metadata_basic():
-    script = '''\
+    script = """\
 # /// script
 # dependencies = ["requests", "rich"]
 # requires-python = ">=3.11"
 # ///
 
 print("hello")
-'''
+"""
     meta = extract_metadata(script)
     assert meta["dependencies"] == ["requests", "rich"]
     assert meta["requires-python"] == ">=3.11"
@@ -55,7 +55,7 @@ print("hello")
 
 
 def test_extract_metadata_multiline():
-    script = '''\
+    script = """\
 # /// script
 # dependencies = [
 #     "requests>=2.28",
@@ -64,7 +64,7 @@ def test_extract_metadata_multiline():
 # ///
 
 print("hello")
-'''
+"""
     meta = extract_metadata(script)
     assert meta["dependencies"] == ["requests>=2.28", "rich"]
 
@@ -73,13 +73,13 @@ print("hello")
 
 
 def test_strip_metadata():
-    script = '''\
+    script = """\
 # /// script
 # dependencies = ["requests"]
 # ///
 
 print("hello")
-'''
+"""
     stripped = strip_metadata(script)
     assert "# /// script" not in stripped
     assert 'print("hello")' in stripped
@@ -103,7 +103,7 @@ def test_build_script_adds_deps():
     script = "print('hello')\n"
     result = build_script(script, extra_dependencies=["requests>=2.28"])
     assert "# /// script" in result
-    assert 'print(\'hello\')' in result
+    assert "print('hello')" in result
     meta = extract_metadata(result)
     assert "requests>=2.28" in meta["dependencies"]
 
@@ -117,13 +117,13 @@ def test_build_script_adds_python_version():
 
 
 def test_build_script_merges_with_existing():
-    script = '''\
+    script = """\
 # /// script
 # dependencies = ["requests"]
 # ///
 
 print("hello")
-'''
+"""
     result = build_script(script, extra_dependencies=["rich"])
     meta = extract_metadata(result)
     assert "requests" in meta["dependencies"]
@@ -131,13 +131,13 @@ print("hello")
 
 
 def test_build_script_deduplicates_deps():
-    script = '''\
+    script = """\
 # /// script
 # dependencies = ["requests>=2.28"]
 # ///
 
 print("hello")
-'''
+"""
     result = build_script(script, extra_dependencies=["requests>=2.30"])
     meta = extract_metadata(result)
     # Should keep the last occurrence (from extra_dependencies)
@@ -146,13 +146,13 @@ print("hello")
 
 
 def test_build_script_preserves_existing_requires_python():
-    script = '''\
+    script = """\
 # /// script
 # requires-python = ">=3.11"
 # ///
 
 print("hello")
-'''
+"""
     result = build_script(script, python_version="3.13")
     meta = extract_metadata(result)
     # Should keep existing requires-python, not override

@@ -37,7 +37,7 @@ uv run pytest e2e_tests/ -v  # E2E tests (slow, needs network)
 
 - Run `uv run pytest tests/ -v` before committing. All tests must pass.
 - Keep dependencies minimal. Do not add runtime deps without strong justification.
-- No type checkers or linters are configured. Keep code straightforward and readable.
+- Lint with `uv run ruff check .` and format with `uv run ruff format --check .` before committing. Fix issues with `--fix` / `ruff format .`.
 - Tool docstrings in `server.py` are user-facing — they become the MCP tool descriptions that agents see. Write them for an LLM audience: include examples, avoid unexplained jargon, link PEPs.
 - Always pin versions in examples (e.g. `"pandas>=2.2"` not `"pandas"`).
 - Sandbox backends must degrade gracefully: if the tool (bwrap, sandbox-exec, docker) is missing, fall back to `NoopSandbox` with a warning.

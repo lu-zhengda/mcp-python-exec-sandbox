@@ -94,7 +94,9 @@ print("=== Top Products ===")
 for prod, rev in top.items():
     print(f"  {prod}: {rev:.2f}")
 
-pivot = df.pivot_table(values="revenue", index="product", columns="region", aggfunc="mean").round(2)
+pivot = df.pivot_table(
+    values="revenue", index="product", columns="region", aggfunc="mean"
+).round(2)
 print("\\n=== Pivot ===")
 print(pivot.to_string())
 """,
@@ -313,7 +315,9 @@ dist = np.random.uniform(1, 30, n)
 
 price = 150*sqft + 20000*bedrooms - 1000*age - 2000*dist + 50000 + np.random.normal(0, 20000, n)
 
-df = pd.DataFrame({"sqft": sqft, "bedrooms": bedrooms, "age": age, "distance": dist, "price": price})
+df = pd.DataFrame({
+    "sqft": sqft, "bedrooms": bedrooms, "age": age, "distance": dist, "price": price
+})
 features = ["sqft", "bedrooms", "age", "distance"]
 X, y = df[features].values, df["price"].values
 
@@ -527,7 +531,7 @@ class TestPEP723InlineMetadata:
     @pytest.mark.asyncio
     async def test_httpx_pydantic_inline(self):
         """Script with inline PEP 723 block declaring httpx + pydantic."""
-        script = '''\
+        script = """\
 # /// script
 # dependencies = ["httpx", "pydantic>=2.0"]
 # requires-python = ">=3.11"
@@ -543,7 +547,7 @@ resp = httpx.get("https://httpbin.org/ip")
 info = IPInfo.model_validate(resp.json())
 print(f"status: {resp.status_code}")
 print(f"ip: {info.origin}")
-'''
+"""
         with tempfile.TemporaryDirectory(prefix="mcp-e2e-") as tmpdir:
             path = Path(tmpdir) / "script.py"
             path.write_text(script, encoding="utf-8")

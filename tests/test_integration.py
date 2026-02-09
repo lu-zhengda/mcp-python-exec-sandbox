@@ -1,6 +1,5 @@
 """Integration tests — require uv installed."""
 
-import asyncio
 import shutil
 import tempfile
 from pathlib import Path
@@ -8,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from mcp_python_exec_sandbox.executor import execute
-from mcp_python_exec_sandbox.output import ExecutionResult
 from mcp_python_exec_sandbox.script import build_script
 
 pytestmark = pytest.mark.skipif(
@@ -56,9 +54,7 @@ class TestRealExecution:
     async def test_script_with_stderr(self):
         with tempfile.TemporaryDirectory(prefix="mcp-test-") as tmpdir:
             script_path = Path(tmpdir) / "test.py"
-            script_path.write_text(
-                "import sys; print('err', file=sys.stderr)\nprint('out')\n"
-            )
+            script_path.write_text("import sys; print('err', file=sys.stderr)\nprint('out')\n")
 
             result = await execute(
                 script_path=script_path,

@@ -9,9 +9,7 @@ import tomli_w
 
 from mcp_python_exec_sandbox.errors import ScriptMetadataError
 
-_METADATA_RE = re.compile(
-    r"(?m)^# /// script\s*\n((?:#[^\n]*\n)*?)# ///$"
-)
+_METADATA_RE = re.compile(r"(?m)^# /// script\s*\n((?:#[^\n]*\n)*?)# ///$")
 
 
 def extract_metadata(script: str) -> dict:

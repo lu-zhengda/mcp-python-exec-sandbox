@@ -47,7 +47,7 @@ print(resp.status_code)
 @pytest.mark.asyncio
 async def test_inline_metadata_in_script():
     """Test that scripts with inline PEP 723 metadata work."""
-    script = '''\
+    script = """\
 # /// script
 # dependencies = ["rich"]
 # requires-python = ">=3.11"
@@ -56,7 +56,7 @@ async def test_inline_metadata_in_script():
 from rich.text import Text
 t = Text("hello")
 print(t.plain)
-'''
+"""
 
     with tempfile.TemporaryDirectory(prefix="mcp-e2e-") as tmpdir:
         script_path = Path(tmpdir) / "test.py"

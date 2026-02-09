@@ -1,6 +1,5 @@
 """E2E tests — require uv + network."""
 
-import asyncio
 import shutil
 import tempfile
 from pathlib import Path

@@ -8,9 +8,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_PACKAGES_FILE = (
-    Path(__file__).parent.parent.parent / "profiles" / "warmup_packages.txt"
-)
+_DEFAULT_PACKAGES_FILE = Path(__file__).parent.parent.parent / "profiles" / "warmup_packages.txt"
 
 _FALLBACK_PACKAGES = [
     "requests",
@@ -59,10 +57,14 @@ async def warm_cache(
 
     try:
         proc = await asyncio.create_subprocess_exec(
-            uv_path, "pip", "download",
-            "--python-version", python_version,
+            uv_path,
+            "pip",
+            "download",
+            "--python-version",
+            python_version,
             *packages,
-            "--dest", "/dev/null",  # We only want the cache side-effect
+            "--dest",
+            "/dev/null",  # We only want the cache side-effect
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -75,7 +77,7 @@ async def warm_cache(
                 proc.returncode,
                 stderr.decode("utf-8", errors="replace")[:500],
             )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.warning("Cache warming timed out after 300s")
     except Exception:
         logger.warning("Cache warming failed", exc_info=True)

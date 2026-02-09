@@ -7,7 +7,6 @@ import os
 import time
 from pathlib import Path
 
-from mcp_python_exec_sandbox.errors import ScriptTimeoutError
 from mcp_python_exec_sandbox.output import ExecutionResult
 
 
@@ -65,10 +64,8 @@ async def execute(
             stderr=asyncio.subprocess.PIPE,
             env=env,
         )
-        stdout_bytes, stderr_bytes = await asyncio.wait_for(
-            proc.communicate(), timeout=timeout
-        )
-    except asyncio.TimeoutError:
+        stdout_bytes, stderr_bytes = await asyncio.wait_for(proc.communicate(), timeout=timeout)
+    except TimeoutError:
         timed_out = True
         proc.kill()
         stdout_bytes, stderr_bytes = await proc.communicate()

@@ -77,9 +77,7 @@ def get_sandbox(backend: str) -> Sandbox:
         if not sb.is_available():
             import logging
 
-            logging.warning(
-                "Native sandbox tool not found, falling back to no sandbox"
-            )
+            logging.warning("Native sandbox tool not found, falling back to no sandbox")
             return NoopSandbox()
         return sb
 
@@ -90,9 +88,7 @@ def get_sandbox(backend: str) -> Sandbox:
         if not sb.is_available():
             import logging
 
-            logging.warning(
-                "Docker not available, falling back to no sandbox"
-            )
+            logging.warning("Docker not available, falling back to no sandbox")
             return NoopSandbox()
         return sb
 

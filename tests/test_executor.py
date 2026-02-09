@@ -1,18 +1,19 @@
 """Tests for executor engine (mocked subprocess)."""
 
-import asyncio
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from mcp_python_exec_sandbox.executor import execute, _build_clean_env
-from mcp_python_exec_sandbox.output import ExecutionResult
+from mcp_python_exec_sandbox.executor import _build_clean_env, execute
 
 
 class TestBuildCleanEnv:
     def test_includes_safe_vars(self):
-        with patch.dict("os.environ", {"PATH": "/usr/bin", "HOME": "/home/user", "SECRET_KEY": "abc123"}):
+        with patch.dict(
+            "os.environ",
+            {"PATH": "/usr/bin", "HOME": "/home/user", "SECRET_KEY": "abc123"},
+        ):
             env = _build_clean_env()
             assert "PATH" in env
             assert "HOME" in env
@@ -72,18 +73,20 @@ class TestExecute:
         mock_proc.returncode = -9
 
         async def slow_communicate():
-            raise asyncio.TimeoutError()
+            raise TimeoutError()
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
-            with patch("asyncio.wait_for", side_effect=asyncio.TimeoutError()):
-                # After timeout, communicate is called again to collect output
-                result = await execute(
-                    script_path=Path("/tmp/test.py"),
-                    python_version="3.13",
-                    timeout=1,
-                    sandbox=None,
-                    max_output_bytes=102400,
-                )
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_proc),
+            patch("asyncio.wait_for", side_effect=TimeoutError()),
+        ):
+            # After timeout, communicate is called again to collect output
+            result = await execute(
+                script_path=Path("/tmp/test.py"),
+                python_version="3.13",
+                timeout=1,
+                sandbox=None,
+                max_output_bytes=102400,
+            )
 
         assert result.timed_out is True
         mock_proc.kill.assert_called_once()
@@ -91,14 +94,24 @@ class TestExecute:
     @pytest.mark.asyncio
     async def test_sandbox_wrapping(self):
         mock_sandbox = MagicMock()
-        mock_sandbox.wrap.return_value = ["sandbox-exec", "-p", "profile", "uv", "run", "--script", "--python", "3.13", "/tmp/test.py"]
+        mock_sandbox.wrap.return_value = [
+            "sandbox-exec",
+            "-p",
+            "profile",
+            "uv",
+            "run",
+            "--script",
+            "--python",
+            "3.13",
+            "/tmp/test.py",
+        ]
 
         mock_proc = AsyncMock()
         mock_proc.communicate = AsyncMock(return_value=(b"ok\n", b""))
         mock_proc.returncode = 0
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc) as mock_exec:
-            result = await execute(
+            await execute(
                 script_path=Path("/tmp/test.py"),
                 python_version="3.13",
                 timeout=30,
@@ -114,9 +127,7 @@ class TestExecute:
     @pytest.mark.asyncio
     async def test_unicode_output(self):
         mock_proc = AsyncMock()
-        mock_proc.communicate = AsyncMock(
-            return_value=("Hello 世界 🌍".encode("utf-8"), b"")
-        )
+        mock_proc.communicate = AsyncMock(return_value=("Hello 世界 🌍".encode(), b""))
         mock_proc.returncode = 0
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):

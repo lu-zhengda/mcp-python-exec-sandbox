@@ -1,7 +1,5 @@
 """Tests for MCP server tool definitions."""
 
-from unittest.mock import patch, MagicMock
-
 import pytest
 
 from mcp_python_exec_sandbox.config import ServerConfig

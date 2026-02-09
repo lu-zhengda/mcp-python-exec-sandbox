@@ -28,10 +28,8 @@ class SandboxExecSandbox(Sandbox):
         # If the profile file exists, read and substitute parameters
         if self._profile_path.exists():
             template = self._profile_path.read_text()
-            return (
-                template
-                .replace("{{SCRIPT_DIR}}", script_dir)
-                .replace("{{CACHE_DIR}}", cache_dir)
+            return template.replace("{{SCRIPT_DIR}}", script_dir).replace(
+                "{{CACHE_DIR}}", cache_dir
             )
 
         # Fallback inline profile
@@ -83,7 +81,8 @@ class SandboxExecSandbox(Sandbox):
 
         return [
             self._sandbox_exec_path or "sandbox-exec",
-            "-p", profile,
+            "-p",
+            profile,
             *cmd,
         ]
 

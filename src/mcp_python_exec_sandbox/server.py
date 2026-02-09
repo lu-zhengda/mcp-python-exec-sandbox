@@ -15,7 +15,7 @@ from fastmcp import FastMCP
 from mcp_python_exec_sandbox.config import ServerConfig
 from mcp_python_exec_sandbox.executor import execute
 from mcp_python_exec_sandbox.output import format_result
-from mcp_python_exec_sandbox.sandbox import Sandbox, get_sandbox
+from mcp_python_exec_sandbox.sandbox import get_sandbox
 from mcp_python_exec_sandbox.script import build_script, extract_metadata
 
 
@@ -47,16 +47,14 @@ def create_server(config: ServerConfig) -> FastMCP:
     # Verify uv is available
     uv_path = shutil.which(config.uv_path) or config.uv_path
     try:
-        result = subprocess.run(
-            [uv_path, "--version"], capture_output=True, text=True, timeout=5
-        )
+        result = subprocess.run([uv_path, "--version"], capture_output=True, text=True, timeout=5)
         if result.returncode != 0:
             raise RuntimeError("uv returned non-zero exit code")
-    except FileNotFoundError:
+    except FileNotFoundError as err:
         raise RuntimeError(
             f"uv not found at '{config.uv_path}'. "
             "Install uv: https://docs.astral.sh/uv/getting-started/installation/"
-        )
+        ) from err
 
     mcp = FastMCP(
         "mcp-python-exec-sandbox",
@@ -67,56 +65,56 @@ def create_server(config: ServerConfig) -> FastMCP:
     @mcp.tool
     async def execute_python(
         script: str,
-        dependencies: list[str] = [],
+        dependencies: list[str] | None = None,
         timeout_seconds: int = config.default_timeout,
     ) -> str:
         """Execute a Python script with automatic dependency management.
 
-The script can include PEP 723 inline metadata (# /// script blocks)
-for declaring dependencies. Additional dependencies can also be passed
-via the dependencies parameter and will be merged.
+        The script can include PEP 723 inline metadata (# /// script blocks)
+        for declaring dependencies. Additional dependencies can also be passed
+        via the dependencies parameter and will be merged.
 
-Args:
-    script: Python source code to execute. May include PEP 723 metadata.
-    dependencies: Extra PEP 508 dependency specifiers to make available.
-    timeout_seconds: Maximum execution time (1-300, default 30).
+        Args:
+            script: Python source code to execute. May include PEP 723 metadata.
+            dependencies: Extra PEP 508 dependency specifiers to make available.
+            timeout_seconds: Maximum execution time (1-300, default 30).
 
-Returns:
-    Formatted output with stdout, stderr, exit code, and duration.
+        Returns:
+            Formatted output with stdout, stderr, exit code, and duration.
 
-Example - simple script:
+        Example - simple script:
 
-    execute_python(script="print('hello')")
+            execute_python(script="print('hello')")
 
-Example - with dependencies parameter:
+        Example - with dependencies parameter:
 
-    execute_python(
-        script="import requests; print(requests.get('https://example.com').status_code)",
-        dependencies=["requests>=2.32"]
-    )
+            execute_python(
+                script="import requests; print(requests.get('https://example.com').status_code)",
+                dependencies=["requests>=2.32"]
+            )
 
-Example - with inline dependency metadata (preferred for multiple deps):
+        Example - with inline dependency metadata (preferred for multiple deps):
 
-    execute_python(script='''
-    # /// script
-    # dependencies = ["pandas>=2.2", "numpy>=1.26"]
-    # ///
+            execute_python(script='''
+            # /// script
+            # dependencies = ["pandas>=2.2", "numpy>=1.26"]
+            # ///
 
-    import pandas as pd
-    import numpy as np
-    print(pd.DataFrame({"a": np.arange(5)}).describe())
-    ''')
+            import pandas as pd
+            import numpy as np
+            print(pd.DataFrame({"a": np.arange(5)}).describe())
+            ''')
 
-Always pin dependency versions (e.g. "pandas>=2.2" instead of "pandas") for
-reproducible results.
+        Always pin dependency versions (e.g. "pandas>=2.2" instead of "pandas") for
+        reproducible results.
 
-The inline metadata block (# /// script ... # ///) is the recommended way to
-declare dependencies directly in the script (see PEP 723:
-https://peps.python.org/pep-0723/). The dependencies parameter is a simpler
-alternative when you just need to add a few packages. Both accept standard
-pip-style version specifiers like "requests>=2.28" or "pandas" (see PEP 508:
-https://peps.python.org/pep-0508/).
-"""
+        The inline metadata block (# /// script ... # ///) is the recommended way to
+        declare dependencies directly in the script (see PEP 723:
+        https://peps.python.org/pep-0723/). The dependencies parameter is a simpler
+        alternative when you just need to add a few packages. Both accept standard
+        pip-style version specifiers like "requests>=2.28" or "pandas" (see PEP 508:
+        https://peps.python.org/pep-0508/).
+        """
         # Clamp timeout
         timeout = max(1, min(timeout_seconds, config.max_timeout))
 
@@ -156,7 +154,9 @@ https://peps.python.org/pep-0508/).
         try:
             result = subprocess.run(
                 [config.uv_path, "--version"],
-                capture_output=True, text=True, timeout=5,
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
             uv_version = result.stdout.strip()
         except Exception:
@@ -178,26 +178,26 @@ https://peps.python.org/pep-0508/).
     @mcp.tool
     async def validate_script(
         script: str,
-        dependencies: list[str] = [],
+        dependencies: list[str] | None = None,
     ) -> str:
         """Validate a Python script's PEP 723 metadata and dependencies without executing it.
 
-Checks metadata syntax, dependency format, and requires-python compatibility.
+        Checks metadata syntax, dependency format, and requires-python compatibility.
 
-Args:
-    script: Python source code to validate. May include inline dependency
-        metadata (# /// script blocks, see https://peps.python.org/pep-0723/).
-    dependencies: Extra dependency specifiers to validate, using standard
-        pip-style format like "requests>=2.28" (see https://peps.python.org/pep-0508/).
+        Args:
+            script: Python source code to validate. May include inline dependency
+                metadata (# /// script blocks, see https://peps.python.org/pep-0723/).
+            dependencies: Extra dependency specifiers to validate, using standard
+                pip-style format like "requests>=2.28" (see https://peps.python.org/pep-0508/).
 
-Returns:
-    Validation result with metadata details or error information.
-"""
+        Returns:
+            Validation result with metadata details or error information.
+        """
         issues: list[str] = []
 
         # Try to parse existing metadata
         try:
-            metadata = extract_metadata(script)
+            extract_metadata(script)
         except Exception as exc:
             return f"INVALID: {exc}"
 

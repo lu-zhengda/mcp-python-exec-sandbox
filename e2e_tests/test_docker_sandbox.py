@@ -17,7 +17,9 @@ def _docker_available() -> bool:
         return False
     try:
         result = subprocess.run(
-            [docker, "info"], capture_output=True, timeout=5,
+            [docker, "info"],
+            capture_output=True,
+            timeout=5,
         )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, OSError):
@@ -31,7 +33,8 @@ def _docker_image_exists(name: str = "mcp-python-exec-sandbox") -> bool:
     try:
         result = subprocess.run(
             [docker, "image", "inspect", name],
-            capture_output=True, timeout=10,
+            capture_output=True,
+            timeout=10,
         )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, OSError):
@@ -49,7 +52,8 @@ pytestmark = [
     ),
     pytest.mark.skipif(
         not _docker_image_exists(),
-        reason="mcp-python-exec-sandbox image not built (run: docker build -t mcp-python-exec-sandbox profiles/)",
+        reason="mcp-python-exec-sandbox image not built "
+        "(run: docker build -t mcp-python-exec-sandbox profiles/)",
     ),
 ]
 
@@ -186,6 +190,7 @@ print(f"ETC_HOSTNAME={etc_hostname}")
 
     # The container gets its own hostname (Docker assigns a short hex id)
     import socket
+
     host_hostname = socket.gethostname()
     # Extract container hostname from output
     for line in result.stdout.splitlines():

@@ -21,7 +21,7 @@ def truncate_output(text: str, max_bytes: int) -> str:
     encoded = text.encode("utf-8")
     if len(encoded) <= max_bytes:
         return text
-    marker = "\n... [truncated at {:.0f}KB]".format(max_bytes / 1024)
+    marker = f"\n... [truncated at {max_bytes / 1024:.0f}KB]"
     marker_bytes = marker.encode("utf-8")
     cut = max_bytes - len(marker_bytes)
     # Decode back, ignoring partial chars at the cut boundary
