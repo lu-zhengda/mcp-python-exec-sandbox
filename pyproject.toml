@@ -1,10 +1,27 @@
 [project]
 name = "mcp-python-exec-sandbox"
-version = "0.1.1"
+version = "0.1.2"
 description = "MCP server for secure Python script execution with automatic dependency management"
+readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
+authors = [{ name = "Zhengda Lu" }]
+keywords = ["mcp", "sandbox", "python", "execution", "ai", "agent"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: Security",
+]
 dependencies = ["fastmcp>=2.0,<3", "tomli-w>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/lu-zhengda/mcp-python-exec-sandbox"
+Repository = "https://github.com/lu-zhengda/mcp-python-exec-sandbox"
+Issues = "https://github.com/lu-zhengda/mcp-python-exec-sandbox/issues"
 
 [project.scripts]
 mcp-python-exec-sandbox = "mcp_python_exec_sandbox.__main__:main"
