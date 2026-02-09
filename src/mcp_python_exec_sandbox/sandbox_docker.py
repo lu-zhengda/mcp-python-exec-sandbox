@@ -91,9 +91,7 @@ class DockerSandbox(Sandbox):
         except (subprocess.TimeoutExpired, OSError):
             return False
         if not self._image_exists():
-            self._pull_thread = threading.Thread(
-                target=self._pull_image_background, daemon=True
-            )
+            self._pull_thread = threading.Thread(target=self._pull_image_background, daemon=True)
             self._pull_thread.start()
         return True
 
