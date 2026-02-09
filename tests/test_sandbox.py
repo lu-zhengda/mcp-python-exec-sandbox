@@ -44,7 +44,11 @@ class TestGetSandbox:
         """On macOS, 'native' redirects to Docker sandbox."""
         from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
 
-        with patch("shutil.which", return_value="/usr/local/bin/docker"):
+        mock_result = type("Result", (), {"returncode": 0})()
+        with (
+            patch("shutil.which", return_value="/usr/local/bin/docker"),
+            patch("subprocess.run", return_value=mock_result),
+        ):
             sb = get_sandbox("native")
             assert isinstance(sb, DockerSandbox)
 
