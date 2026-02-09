@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import shutil
 import subprocess
+import threading
 from pathlib import Path
 
 from mcp_python_exec_sandbox.sandbox import Sandbox
@@ -19,6 +20,8 @@ class DockerSandbox(Sandbox):
 
     def __init__(self) -> None:
         self._docker_path = shutil.which("docker")
+        self._pull_thread: threading.Thread | None = None
+        self._pull_success: bool | None = None
 
     def _image_exists(self) -> bool:
         """Check if the Docker image is available locally."""
@@ -59,6 +62,21 @@ class DockerSandbox(Sandbox):
             logger.warning("Error pulling %s: %s", _IMAGE_NAME, exc)
             return False
 
+    def _pull_image_background(self) -> None:
+        """Pull the image and store the result."""
+        self._pull_success = self._pull_image()
+
+    def _ensure_image(self) -> bool:
+        """Wait for a background pull to finish, or check that the image exists."""
+        if self._pull_thread is not None:
+            self._pull_thread.join(timeout=120)
+            if self._pull_thread.is_alive():
+                logger.warning("Background pull still running, proceeding without image")
+                return False
+            self._pull_thread = None
+            return bool(self._pull_success)
+        return self._image_exists()
+
     def is_available(self) -> bool:
         if self._docker_path is None:
             return False
@@ -73,10 +91,16 @@ class DockerSandbox(Sandbox):
         except (subprocess.TimeoutExpired, OSError):
             return False
         if not self._image_exists():
-            return self._pull_image()
+            self._pull_thread = threading.Thread(
+                target=self._pull_image_background, daemon=True
+            )
+            self._pull_thread.start()
         return True
 
     def wrap(self, cmd: list[str], script_path: Path) -> list[str]:
+        # Block until background pull (if any) finishes
+        self._ensure_image()
+
         script_dir = str(script_path.parent)
         docker = self._docker_path or "docker"
 

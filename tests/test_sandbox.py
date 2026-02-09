@@ -105,7 +105,7 @@ class TestDockerSandbox:
             sb = DockerSandbox()
             assert sb.is_available() is False
 
-    def test_is_available_pulls_when_image_missing(self):
+    def test_is_available_starts_background_pull_when_image_missing(self):
         from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
 
         mock_result = type("Result", (), {"returncode": 0})()
@@ -115,13 +115,15 @@ class TestDockerSandbox:
         ):
             sb = DockerSandbox()
         with (
-            patch.object(sb, "_image_exists", return_value=False) as mock_exists,
-            patch.object(sb, "_pull_image", return_value=True) as mock_pull,
+            patch.object(sb, "_image_exists", return_value=False),
+            patch.object(sb, "_pull_image_background") as mock_bg,
             patch("subprocess.run", return_value=mock_result),
+            patch("threading.Thread") as mock_thread,
         ):
+            mock_thread.return_value.start = mock_bg
             assert sb.is_available() is True
-            mock_exists.assert_called_once()
-            mock_pull.assert_called_once()
+            # Pull is started in background, not blocking
+            mock_thread.assert_called_once()
 
     def test_is_available_skips_pull_when_image_exists(self):
         from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
@@ -140,3 +142,13 @@ class TestDockerSandbox:
             assert sb.is_available() is True
             mock_exists.assert_called_once()
             mock_pull.assert_not_called()
+
+    def test_wrap_waits_for_background_pull(self):
+        from mcp_python_exec_sandbox.sandbox_docker import DockerSandbox
+
+        with patch("shutil.which", return_value="/usr/local/bin/docker"):
+            sb = DockerSandbox()
+        with patch.object(sb, "_ensure_image") as mock_ensure:
+            cmd = ["uv", "run", "--script", "/tmp/test.py"]
+            sb.wrap(cmd, Path("/tmp/test.py"))
+            mock_ensure.assert_called_once()
